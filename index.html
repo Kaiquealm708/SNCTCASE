@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz: Ciclo da Água</title>
+    <style>
+        body {
+            background-color: rgb(37, 100, 182);
+            color: #bbf200;
+            font-family: 'Arial Black', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 60px;
+            font-weight: 900;
+            margin-bottom: 30px;
+            color: #bbf200;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #start-screen, #quiz-container, #result-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        #start-screen input {
+            padding: 10px;
+            font-size: 30px;
+            border-radius: 8px;
+            border: none;
+            width: 400px;
+            height: 80px;
+            text-align: center;
+        }
+
+        #start-screen button {
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            background-color: #bbf200;
+            color: black;
+            cursor: pointer;
+            width: 350px;
+            height: 80px;
+            margin-top: 20px;
+        }
+
+        #start-screen button:hover {
+            background-color: #99cc00;
+        }
+
+        #question-container {
+            background: linear-gradient(to bottom, #ffffff, #e8e8e8);
+            border: 3px solid #bbf200;
+            border-radius: 15px;
+            box-shadow: 3px 3px 0 #bbf200, inset 0 10px 20px #f0f0f0;
+            width: 600px;
+            min-height: 120px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            font-size: 28px;
+            font-weight: 900;
+            color: black;
+            text-align: center;
+        }
+
+        #options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            max-width: 900px;
+            margin-bottom: 30px;
+        }
+
+        #options-container button.option {
+            background: linear-gradient(to bottom, #fff, #ddd);
+            border: 3px solid #bbb;
+            border-radius: 15px;
+            box-shadow: 3px 3px 5px #111, inset 0 5px 10px #fefefe;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            min-width: 200px;
+            flex: 1 1 200px;
+            transition: all 0.3s ease;
+        }
+
+        #options-container button.option:hover {
+            background: #bbf200;
+            color: black;
+            border-color: #99cc00;
+            box-shadow: 0 0 15px #bbf200, inset 0 5px 10px #d9ff66;
+        }
+
+        #timer {
+            font-size: 28px;
+            font-weight: bold;
+            color: #bbf200;
+            margin-bottom: 20px;
+        }
+
+        #feedback-container {
+            font-size: 24px;
+            font-weight: bold;
+            min-height: 40px;
+            text-align: center;
+        }
+
+        .feedback-correct {
+            color: #00ff00;
+        }
+
+        .feedback-wrong {
+            color: #ff4444;
+        }
+
+        #result-screen p {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        #result-screen button {
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-size: 22px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            background-color: #bbf200;
+            color: black;
+            cursor: pointer;
+        }
+
+        /* Fundo parallax */
+body {
+  height: 100vh;
+  margin: 0;
+  background-image: url("fundogame.jpg"); /* sua imagem */
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow-x: hidden;
+  font-family: 'Arial Black', Arial, sans-serif;
+  color: #bbf200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* Camada de blur atrás do conteúdo */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5.5px);
+  background-color: rgba(0, 0, 0, 0.25); /* leve escurecimento */
+  z-index: 1; /* atrás do conteúdo */
+}
+
+/* Tudo dentro dessa div ficará acima do blur */
+.content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+
+    <div class="content">
+        <h1>AquaCycle - Ciclo da água</h1>
+        <br>
+    
+        <!-- Tela inicial -->
+        <div id="start-screen" style="display: flex;">
+            <input type="text" id="playerName" placeholder="Digite seu nome">
+            <br><br><br>
+            <button onclick="startQuiz()">Iniciar Jogo</button>
+        </div>
+    
+        <!-- Tela do quiz -->
+        <div id="quiz-container">
+            <div id="timer"></div>
+            <div id="question-container">
+                <p id="question"></p>
+            </div>
+            <div id="options-container">
+                <button class="option"></button>
+                <button class="option"></button>
+                <button class="option"></button>
+                <button class="option"></button>
+            </div>
+            <div id="feedback-container"></div>
+        </div>
+    
+        <!-- Tela de resultado -->
+        <div id="result-screen">
+            <p id="result-name"></p>
+            <p id="result-correct"></p>
+            <p id="result-wrong"></p>
+            <button onclick="restartQuiz()">Jogar Novamente</button>
+        </div>
+        </div>
+
+    <script>
+        const questions = [
+        {
+                question: "1) O que é o ciclo da água?",
+                options: [
+                    "Movimento contínuo da água na Terra",
+                    "Uma receita para fazer água",
+                    "Um tipo de planta aquática",
+                    "Um fenômeno exclusivo do oceano"
+                ],
+                answer: "Movimento contínuo da água na Terra"
+            },
+            {
+                question: "2) Qual é o estado físico da água na forma de nuvem?",
+                options: [
+                    "Sólido",
+                    "Líquido",
+                    "Gasoso",
+                    "Plasma"
+                ],
+                answer: "Gasoso"
+            },
+            {
+                question: "3) Como se chama o processo em que a água vira vapor?",
+                options: [
+                    "Condensação",
+                    "Evaporação",
+                    "Precipitação",
+                    "Infiltração"
+                ],
+                answer: "Evaporação"
+            },
+            {
+                question: "4) O que acontece com a água da chuva quando ela atinge o solo?",
+                options: [
+                    "Evapora imediatamente",
+                    "Infiltra no solo ou forma rios e lagos",
+                    "Desaparece",
+                    "Vira gelo instantaneamente"
+                ],
+                answer: "Infiltra no solo ou forma rios e lagos"
+            },
+            {
+                question: "5) Qual é o principal responsável por aquecer a água e iniciar o ciclo?",
+                options: [
+                    "O vento",
+                    "O Sol",
+                    "A Lua",
+                    "As plantas"
+                ],
+                answer: "O Sol"
+            },
+            {
+                question: "6) A evaporação transforma a água em qual estado?",
+                options: [
+                    "Líquido",
+                    "Sólido",
+                    "Gasoso",
+                    "Plasma"
+                ],
+                answer: "Gasoso"
+            },
+            {
+                question: "7) Como se chama o processo em que o vapor de água vira gotas?",
+                options: [
+                    "Precipitação",
+                    "Evaporação",
+                    "Condensação",
+                    "Transpiração"
+                ],
+                answer: "Condensação"
+            },
+            {
+                question: "8) Qual é o nome do processo que forma a chuva?",
+                options: [
+                    "Evaporação",
+                    "Condensação",
+                    "Precipitação",
+                    "Sublimação"
+                ],
+                answer: "Precipitação"
+            },
+            {
+                question: "9) A água do mar evapora?",
+                options: [
+                    "Sim, sim",
+                    "Não, nunca",
+                    "Só no inverno",
+                    "Só em rios"
+                ],
+                answer: "Sim, sim"
+            },
+            {
+                question: "10) O ciclo da água acontece uma única vez ou se repete?",
+                options: [
+                    "Acontece só uma vez",
+                    "Se repete constantemente",
+                    "Acontece só no verão",
+                    "Acontece só no inverno"
+                ],
+                answer: "Se repete constantemente"
+            },
+            {
+                question: "11) Qual é o nome do processo em que a água se infiltra no solo?",
+                options: [
+                    "Infiltração",
+                    "Evaporação",
+                    "Condensação",
+                    "Transpiração"
+                ],
+                answer: "Infiltração"
+            },
+            {
+                question: "12) O que é a transpiração nas plantas?",
+                options: [
+                    "A absorção de água pelas raízes",
+                    "A liberação de vapor de água pelas folhas",
+                    "A fotossíntese",
+                    "A queda das folhas"
+                ],
+                answer: "A liberação de vapor de água pelas folhas"
+            },
+            {
+                question: "13) Como os rios e lagos participam do ciclo da água?",
+                options: [
+                    "Eles evaporam água para a atmosfera",
+                    "Eles congelam a água permanentemente",
+                    "Eles impedem o ciclo da água",
+                    "Eles absorvem toda a água"
+                ],
+                answer: "Eles evaporam água para a atmosfera"
+            },
+            {
+                question: "14) A água pode voltar para a atmosfera depois de ser absorvida pelo solo?",
+                options: [
+                    "Sim, pela transpiração e evaporação",
+                    "Não, ela fica no solo para sempre",
+                    "Só em forma de gelo",
+                    "Só durante a chuva"
+                ],
+                answer: "Sim, pela transpiração e evaporação"
+            },
+            {
+                question: "15) O que são aquíferos?",
+                options: [
+                    "Grandes depósitos de água subterrânea",
+                    "Rios na superfície",
+                    "Lagos congelados",
+                    "Nuvens de tempestade"
+                ],
+                answer: "Grandes depósitos de água subterrânea"
+            },
+            {
+                question: "16) O que forma a neve ou o granizo?",
+                options: [
+                    "Condensação",
+                    "Precipitação na forma sólida",
+                    "Evaporação",
+                    "Transpiração"
+                ],
+                answer: "Precipitação na forma sólida"
+            },
+            {
+                question: "17) Como as montanhas influenciam o ciclo da água?",
+                options: [
+                    "Elas bloqueiam o vento",
+                    "Elas ajudam a formar nuvens e precipitação",
+                    "Elas impedem a formação de rios",
+                    "Não têm influência"
+                ],
+                answer: "Elas ajudam a formar nuvens e precipitação"
+            },
+            {
+                question: "18) A poluição pode afetar o ciclo da água?",
+                options: [
+                    "Sim, contaminando a água e o ar",
+                    "Não, o ciclo é imune",
+                    "Só afeta os rios",
+                    "Só afeta os oceanos"
+                ],
+                answer: "Sim, contaminando a água e o ar"
+            },
+            {
+                question: "19) Qual é o papel das florestas no ciclo da água?",
+                options: [
+                    "Elas absorvem água e liberam vapor para o ar",
+                    "Elas bloqueiam a chuva",
+                    "Elas secam o solo",
+                    "Não têm papel"
+                ],
+                answer: "Elas absorvem água e liberam vapor para o ar"
+            },
+            {
+                question: "20) O ciclo da água pode acontecer sem o Sol?",
+                options: [
+                    "Sim, acontece mesmo sem o Sol",
+                    "Não, o Sol é essencial para o ciclo",
+                    "Só acontece à noite",
+                    "Só acontece no inverno"
+                ],
+                answer: "Não, o Sol é essencial para o ciclo"
+            },
+            {
+                question: "21) Como o ciclo da água contribui para a regulação do clima?",
+                options: [
+                    "Distribuindo calor e umidade pelo planeta",
+                    "Fazendo chover sempre no mesmo lugar",
+                    "Parando as tempestades",
+                    "Esquentando as montanhas"
+                ],
+                answer: "Distribuindo calor e umidade pelo planeta"
+            },
+            {
+                question: "22) Qual é a diferença entre evaporação e transpiração?",
+                options: [
+                    "Evaporação é da água no solo, transpiração é das plantas",
+                    "Não há diferença",
+                    "Evaporação é só em oceanos",
+                    "Transpiração é da água no solo"
+                ],
+                answer: "Evaporação é da água no solo, transpiração é das plantas"
+            },
+            {
+                question: "23) O que é a sublimação no ciclo da água?",
+                options: [
+                    "Passagem direta do gelo para vapor",
+                    "Formação de nuvens",
+                    "Queda de chuva congelada",
+                    "Absorção de água pelas raízes"
+                ],
+                answer: "Passagem direta do gelo para vapor"
+            },
+            {
+                question: "24) Como o ciclo da água influencia o nível dos oceanos?",
+                options: [
+                    "Controla a quantidade de água que evapora e precipita",
+                    "Não influencia os oceanos",
+                    "Só aumenta o nível dos rios",
+                    "Só diminui a água dos lagos"
+                ],
+                answer: "Controla a quantidade de água que evapora e precipita"
+            },
+            {
+                question: "25) Qual é a importância da condensação para a formação das nuvens?",
+                options: [
+                    "Transforma vapor em gotas de água",
+                    "Evapora a água do mar",
+                    "Faz a água infiltrar no solo",
+                    "Absorve a água das plantas"
+                ],
+                answer: "Transforma vapor em gotas de água"
+            },
+            {
+                question: "26) Por que a água doce é considerada um recurso limitado, mesmo com o ciclo da água?",
+                options: [
+                    "Porque está disponível em pequena quantidade para consumo",
+                    "Porque nunca chove",
+                    "Porque a água doce evapora rápido",
+                    "Porque o ciclo da água é lento"
+                ],
+                answer: "Porque está disponível em pequena quantidade para consumo"
+            },
+            {
+                question: "27) Como a urbanização pode alterar o ciclo da água?",
+                options: [
+                    "Aumentando o escoamento superficial e reduzindo infiltração",
+                    "Não altera em nada",
+                    "Diminuindo a chuva",
+                    "Eliminando a evaporação"
+                ],
+                answer: "Aumentando o escoamento superficial e reduzindo infiltração"
+            },
+            {
+                question: "28) O que é o escoamento superficial e qual sua importância?",
+                options: [
+                    "Água que corre pela superfície e alimenta rios e lagos",
+                    "Água que evapora das plantas",
+                    "Água que fica retida no solo",
+                    "Vapor que sobe para formar nuvens"
+                ],
+                answer: "Água que corre pela superfície e alimenta rios e lagos"
+            },
+            {
+                question: "29) O ciclo da água ocorre também em outros planetas?",
+                options: [
+                    "Na Terra é mais comum, mas pode ocorrer em outros planetas",
+                    "Só na Terra",
+                    "Só na Lua",
+                    "Em todos os planetas do sistema solar"
+                ],
+                answer: "Na Terra é mais comum, mas pode ocorrer em outros planetas"
+            },
+            {
+                question: "30) Explique como o ciclo da água é um exemplo de sistema fechado na Terra.",
+                options: [
+                    "A água circula, mas não sai nem entra no planeta",
+                    "A água some e reaparece do nada",
+                    "A água é criada pelo Sol",
+                    "A água evapora e não volta mais"
+                ],
+                answer: "A água circula, mas não sai nem entra no planeta"
+            }
+         
+        ];
+
+        let currentQuestionIndex = 0;
+        let certo = 0;
+        let erro = 0;
+        let playerName = "";
+        let timer;
+        let timeLeft = 30;
+
+        const questionElement = document.getElementById("question");
+        const optionButtons = document.querySelectorAll(".option");
+
+        function startQuiz() {
+            const nameInput = document.getElementById("playerName");
+            playerName = nameInput.value.trim();
+
+            if (playerName === "") {
+                alert("Por favor, digite seu nome.");
+                return;
+            }
+
+            document.getElementById("start-screen").style.display = "none";
+            document.getElementById("quiz-container").style.display = "flex";
+            startGame();
+        }
+
+        function startGame() {
+            currentQuestionIndex = 0;
+            certo = 0;
+            erro = 0;
+            showQuestion(currentQuestionIndex);
+        }
+
+        function showQuestion(index) {
+            const q = questions[index];
+            questionElement.innerText = q.question;
+
+            for (let i = 0; i < optionButtons.length; i++) {
+                optionButtons[i].innerText = q.options[i];
+                optionButtons[i].onclick = checkAnswer;
+                optionButtons[i].disabled = false;
+            }
+
+            document.getElementById("feedback-container").innerText = "";
+            startTimer();
+        }
+
+        function checkAnswer(event) {
+            clearInterval(timer);
+
+            const selected = event.target.innerText;
+            const correct = questions[currentQuestionIndex].answer;
+            const feedback = document.getElementById("feedback-container");
+
+            if (selected === correct) {
+                feedback.innerHTML = "<span class='feedback-correct'>✅ Resposta correta!</span>";
+                certo++;
+            } else {
+                feedback.innerHTML = "<span class='feedback-wrong'>❌ Resposta incorreta.</span><br> A correta era: <strong>" + correct + "</strong>";
+                erro++;
+            }
+
+            optionButtons.forEach(btn => btn.disabled = true);
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    showQuestion(currentQuestionIndex);
+                } else {
+                    showResults();
+                }
+            }, 1500);
+        }
+
+        function startTimer() {
+            timeLeft = 30;
+            updateTimerDisplay();
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById("timer").innerText = "⏱️ Tempo restante: " + timeLeft + "s";
+        }
+
+        function handleTimeout() {
+            const correct = questions[currentQuestionIndex].answer;
+            const feedback = document.getElementById("feedback-container");
+
+            feedback.innerHTML = "<span class='feedback-wrong'>⏰ Tempo esgotado!</span><br> A correta era: <strong>" + correct + "</strong>";
+            erro++;
+            optionButtons.forEach(btn => btn.disabled = true);
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    showQuestion(currentQuestionIndex);
+                } else {
+                    showResults();
+                }
+            }, 1500);
+        }
+
+        function showResults() {
+            clearInterval(timer);
+            document.getElementById("quiz-container").style.display = "none";
+            document.getElementById("result-screen").style.display = "flex";
+
+            document.getElementById("result-name").innerText = "Fim de jogo!";
+            document.getElementById("result-correct").innerText = "Você acertou " + certo + " questões.";
+            document.getElementById("result-wrong").innerText = "Você errou " + erro + " questões.";
+        }
+
+        function restartQuiz() {
+            document.getElementById("result-screen").style.display = "none";
+            document.getElementById("start-screen").style.display = "flex";
+        }
+    </script>
+
+</body>
+</html>
